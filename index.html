@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stoplight Game!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #c2e9fb 0%, #81a4fd 100%);
+      font-family: 'Fredoka One', Arial, sans-serif;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+      margin-top: 20px;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px #ffffff88;
+    }
+    .stoplight-container {
+      margin: 8vw auto 0;
+      width: 88vw;
+      max-width: 260px;
+      background: #333;
+      border-radius: 34px;
+      box-shadow: 0 8px 24px #0006;
+      padding: 7vw 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7vw;
+      min-height: 70vw;
+      max-height: 410px;
+    }
+    .light {
+      width: 20vw;
+      max-width: 90px;
+      height: 20vw;
+      max-height: 90px;
+      min-width: 54px;
+      min-height: 54px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #666;
+      box-shadow: 0 0 24px #0005;
+      transition: background 0.4s, box-shadow 0.4s;
+      border: 6px solid #222;
+      position: relative;
+      z-index: 1;
+      touch-action: manipulation;
+    }
+    .light.red.on {
+      background: radial-gradient(circle, #ff4545 60%, #c20000 100%);
+      box-shadow: 0 0 44px 9px #ff4545aa;
+      border-color: #ff4545;
+    }
+    .light.yellow.on {
+      background: radial-gradient(circle, #ffe900 60%, #c7a900 100%);
+      box-shadow: 0 0 44px 9px #ffe900aa;
+      border-color: #ffe900;
+    }
+    .light.green.on {
+      background: radial-gradient(circle, #31e34c 60%, #109a2d 100%);
+      box-shadow: 0 0 44px 9px #31e34caa;
+      border-color: #31e34c;
+    }
+    .label {
+      text-align: center;
+      font-size: 1.05rem;
+      color: #fff;
+      margin-top: -10px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-shadow: 1px 2px 6px #111a;
+      font-family: 'Fredoka One', Arial, sans-serif;
+    }
+    #timer {
+      font-size: 2rem;
+      color: #444;
+      margin: 30px 0 0 0;
+      text-shadow: 1px 1px 8px #fff9, 0 2px 0 #ffe;
+      background: #f7f7f7dd;
+      padding: 10px 26px;
+      border-radius: 30px;
+      display: inline-block;
+      border: 2px solid #bbb;
+      box-shadow: 0 2px 8px #9995;
+      font-family: 'Fredoka One', Arial, sans-serif;
+      min-width: 84px;
+    }
+    .instruction {
+      color: #333;
+      margin: 18px auto 0;
+      max-width: 350px;
+      font-size: 1rem;
+      background: #fff7;
+      padding: 10px 15px;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px #aaa2;
+    }
+    #restart-btn {
+      margin: 22px 0 0 0;
+      padding: 11px 18px;
+      font-size: 1.15rem;
+      border-radius: 18px;
+      border: none;
+      background: #31e34c;
+      color: #fff;
+      font-family: 'Fredoka One', Arial, sans-serif;
+      box-shadow: 0 2px 8px #2224;
+      cursor: pointer;
+      transition: background 0.2s;
+      min-width: 112px;
+      touch-action: manipulation;
+    }
+    #restart-btn:active,
+    #restart-btn:hover {
+      background: #229930;
+    }
+    @media (min-width: 700px) {
+      .stoplight-container {
+        width: 160px;
+        min-height: 400px;
+        padding: 30px 0;
+        gap: 28px;
+        max-width: 200px;
+      }
+      .light {
+        width: 90px;
+        height: 90px;
+        min-width: 80px;
+        min-height: 80px;
+        max-width: 100px;
+        max-height: 100px;
+      }
+      #timer { font-size: 2.4rem; padding: 14px 36px;}
+      #restart-btn { font-size: 1.3rem; padding: 12px 28px;}
+      h1 { font-size: 2.7rem;}
+    }
+  </style>
+</head>
+<body>
+  <h1>🚦 Stoplight Game!</h1>
+  <div class="instruction">
+    <span>Watch the stoplight change! Can you guess which color will come next?</span>
+  </div>
+  <div class="stoplight-container">
+    <div class="label">STOP</div>
+    <div class="light red" id="red"></div>
+    <div class="label">WAIT</div>
+    <div class="light yellow" id="yellow"></div>
+    <div class="label">GO!</div>
+    <div class="light green" id="green"></div>
+  </div>
+  <div id="timer">Ready?</div>
+  <button id="restart-btn">Restart</button>
+
+  <!-- Audio for each color (can replace these URLs) -->
+  <audio id="sound-red" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9f93c8.mp3"></audio>
+  <audio id="sound-yellow" src="https://cdn.pixabay.com/audio/2022/07/26/audio_1232d8e49d.mp3"></audio>
+  <audio id="sound-green" src="https://cdn.pixabay.com/audio/2022/10/16/audio_125b5a2e6c.mp3"></audio>
+
+  <script>
+    // Utility to get duration for each color
+    function askDuration(colorName) {
+      let answer = prompt(
+        `How many seconds for ${colorName} light?\n` +
+        "- Enter a number (e.g., 3 = 3 seconds)\n" +
+        "- Or type RANDOM to randomize (max 10 seconds)"
+      );
+      if (!answer) return askDuration(colorName);
+      answer = answer.trim().toLowerCase();
+      if (answer === 'random') {
+        return Math.floor(Math.random() * 10) + 1;
+      }
+      let num = parseInt(answer);
+      if (!isNaN(num) && num > 0 && num <= 30) {
+        return num;
+      }
+      alert("Please enter a valid number (1-30), or type RANDOM.");
+      return askDuration(colorName);
+    }
+
+    // Audio elements
+    const soundRed = document.getElementById('sound-red');
+    const soundYellow = document.getElementById('sound-yellow');
+    const soundGreen = document.getElementById('sound-green');
+
+    // Stoplight elements
+    const redLight = document.getElementById('red');
+    const yellowLight = document.getElementById('yellow');
+    const greenLight = document.getElementById('green');
+    const timer = document.getElementById('timer');
+    const restartBtn = document.getElementById('restart-btn');
+
+    let colors = ['red', 'yellow', 'green'];
+    let durations = [3, 1, 3]; // will set below
+    let countdown = 0;
+    let current = 0; // 0=red, 1=yellow, 2=green
+    let gameInterval = null;
+
+    // Visual "on/off"
+    function setLights(index) {
+      redLight.classList.toggle('on', index === 0);
+      yellowLight.classList.toggle('on', index === 1);
+      greenLight.classList.toggle('on', index === 2);
+    }
+
+    function playSound(index) {
+      if (index === 0) {soundRed.currentTime = 0; soundRed.play();}
+      if (index === 1) {soundYellow.currentTime = 0; soundYellow.play();}
+      if (index === 2) {soundGreen.currentTime = 0; soundGreen.play();}
+    }
+
+    // Get durations from user
+    function setupDurations() {
+      durations[0] = askDuration("RED (STOP)");
+      durations[1] = askDuration("YELLOW (WAIT)");
+      durations[2] = askDuration("GREEN (GO)");
+      alert(
+        `Here are your times:\n` +
+        `Red: ${durations[0]}s, Yellow: ${durations[1]}s, Green: ${durations[2]}s`
+      );
+    }
+
+    function nextLight() {
+      current = (current + 1) % 3;
+      setLights(current);
+      playSound(current);
+      countdown = durations[current];
+      timer.textContent = countdown + "s";
+    }
+
+    function tick() {
+      countdown--;
+      if (countdown <= 0) {
+        nextLight();
+      } else {
+        timer.textContent = countdown + "s";
+      }
+    }
+
+    function startGame() {
+      setupDurations();
+      current = 0;
+      setLights(current);
+      playSound(current);
+      countdown = durations[current];
+      timer.textContent = countdown + "s";
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(tick, 1000);
+    }
+
+    restartBtn.onclick = function() {
+      if (gameInterval) clearInterval(gameInterval);
+      startGame();
+    };
+
+    // On load
+    window.onload = startGame;
+
+    // For mobile browsers, allow sound on first user interaction
+    [redLight, yellowLight, greenLight, restartBtn].forEach(el => {
+      el.addEventListener('touchstart', function() {
+        soundRed.play();
+        soundYellow.play();
+        soundGreen.play();
+      }, {once:true});
+      el.addEventListener('click', function() {
+        soundRed.play();
+        soundYellow.play();
+        soundGreen.play();
+      }, {once:true});
+    });
+  </script>
+</body>
+</html>
